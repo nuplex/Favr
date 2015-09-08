@@ -11,8 +11,12 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+
+import org.json.JSONObject;
 
 
 public class LoginActivity extends ActionBarActivity {
@@ -34,6 +38,25 @@ public class LoginActivity extends ActionBarActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
 
+                GraphRequest request = GraphRequest.newMeRequest(
+                        loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(
+                                    JSONObject object,
+                                    GraphResponse response) {
+                                try {
+                                    info.setText("name " + object.getString("name"));
+                                }catch(Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,link");
+                request.setParameters(parameters);
+                request.executeAsync();
             }
 
             @Override
